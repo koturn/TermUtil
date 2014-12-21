@@ -38,6 +38,7 @@ CONSOLE_SCREEN_BUFFER_INFO tu_init_state;
 WORD tu_current_color;
 HANDLE hConsoleStdOut;
 static CONSOLE_CURSOR_INFO tu_init_cci;
+int is_nonblocking = 0;
 #else
 struct termios tu_init_tio;
 #endif

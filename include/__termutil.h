@@ -565,7 +565,10 @@ tu_nonblocking(void)
 {
 #if defined(__TU_USE_CURSES__)
   nodelay(stdscr, 1);
-#elif !defined(_MSC_VER)
+#elif defined(_MSC_VER)
+  extern int is_nonblocking;
+  is_nonblocking = 1;
+#else
   fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 #endif
 }
@@ -579,7 +582,10 @@ tu_blocking(void)
 {
 #if defined(__TU_USE_CURSES__)
   nodelay(stdscr, 0);
-#elif !defined(_MSC_VER)
+#elif defined(_MSC_VER)
+  extern int is_nonblocking;
+  is_nonblocking = 0;
+#else
   int ret = fcntl(STDIN_FILENO, F_GETFL, 0);
   ret &= ~(ret & O_NONBLOCK);
   fcntl(STDIN_FILENO, F_SETFL, ret);
@@ -610,13 +616,52 @@ tu_getch(void)
 #if defined(__TU_USE_CURSES__)
   return getch();
 #elif defined(_MSC_VER)
+  extern int is_nonblocking;
 #  if _MSC_VER >= 1400
-  return _kbhit() ? _getch() : EOF;
+  return is_nonblocking ? (_kbhit() ? _getch() : EOF) : _getch();
 #  else
-  return kbhit() ? getch() : EOF;
+  return is_nonblocking ? (kbhit() ? getch() : EOF) : getch();
 #  endif
 #else
   return getchar();
+#endif
+}
+
+
+/*!
+ * @brief Inform whether key is pushed or not
+ * @return  Return 1 when key is pushed, otherwise return 0
+ */
+__TU_STATIC__ __TU_INLINE__ int
+tu_kbhit(void)
+{
+#if defined(_MSC_VER)
+#  if _MSC_VER >= 1400
+  return _kbhit();
+#  else
+  return kbhit();
+#  endif
+#else
+  struct termios oldt, newt;
+  int ch;
+  int oldf;
+
+  tcgetattr(STDIN_FILENO, &oldt);
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+  fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+  ch = getchar();
+  if (ch != EOF) {
+    ungetc(ch, stdin);
+    return 1;
+  }
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  fcntl(STDIN_FILENO, F_SETFL, oldf);
+  return 0;
 #endif
 }
 

@@ -242,6 +242,9 @@ tu_refresh(void);
 __TU_STATIC__ __TU_INLINE__ int
 tu_getch(void);
 
+__TU_STATIC__ __TU_INLINE__ int
+tu_kbhit(void);
+
 __TU_STATIC__ __TU_INLINE__ void
 tu_setcur(int is_show);
 
