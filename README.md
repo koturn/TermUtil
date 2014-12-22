@@ -19,8 +19,22 @@ $ make
 
 #### MSVC
 
+###### Release version
+
 ```sh
 > nmake /f msvc.mk
+```
+
+###### Debug version
+
+```sh
+> nmake /f msvc.mk DEBUG=true
+```
+
+If you want to build with Dynalic-Link CRT Library, build as following.
+
+```sh
+> nmake /f msvc.mk CRTDLL=true
 ```
 
 

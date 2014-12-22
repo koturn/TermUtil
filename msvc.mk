@@ -1,25 +1,39 @@
+!if "$(CRTDLL)" == "true"
+CRTLIB = /MD$(DBG_SUFFIX)
+!else
+CRTLIB = /MT$(DBG_SUFFIX)
+!endif
+
+!if "$(DEBUG)" == "true"
+COPTFLAGS   = /Od /GS /Zi $(CRTLIB)
+AROPTFLAGS  =
+MSVC_MACROS = /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS \
+              /D_USE_MATH_DEFINES
+DBG_SUFFIX  = d
+!else
+COPTFLAGS   = /Ox /GL $(CRTLIB)
+AROPTFLAGS  = /LTCG
+MSVC_MACROS = /DNDEBUG /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS \
+              /D_USE_MATH_DEFINES
+DBG_SUFFIX  =
+!endif
+
 CC = cl
 AR = lib
 RM = del /F
 
-MACROS  = /D_CRT_SECURE_NO_WARNINGS /DNDEBUG
-CFLAGS  = /nologo /O2 /W4 /c $(MACROS)
-LDFLAGS = /nologo /O2
-ARFLAGS = /nologo
+MACROS  = $(MSVC_MACROS)
+CFLAGS  = /nologo $(COPTFLAGS) /W4 /c $(MACROS)
+ARFLAGS = /nologo $(AROPTFLAGS)
 
 DST_DIR = lib
 SRC_DIR = src
 INC_DIR = include
 
-TARGET  = $(DST_DIR)\termutil.lib
-OBJ     = $(SRC_DIR)\termutil.obj
-SRC     = $(OBJ:.obj=.c)
+TARGET  = $(DST_DIR)\termutil$(DBG_SUFFIX).lib
+OBJ     = $(SRC_DIR)\termutil$(DBG_SUFFIX).obj
+SRC     = $(SRC_DIR)\termutil.c
 HEADER  = $(INC_DIR)\termutil.h
-
-
-.SUFFIXES: .c .obj
-.c.obj:
-	$(CC) $(CFLAGS) $** /c /Fo$@
 
 
 all: $(TARGET)
@@ -30,6 +44,7 @@ $(TARGET): $(OBJ)
 	$(AR) $(ARFLAGS) $** /OUT:$@
 
 $(OBJ): $(SRC) $(HEADER)
+	$(CC) $(CFLAGS) $** /c /Fo$@
 
 
 clean:
