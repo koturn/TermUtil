@@ -1,6 +1,8 @@
 TermUtil
 ========
 
+[![Build Status](https://travis-ci.org/koturn/TermUtil.png)](https://travis-ci.org/koturn/TermUtil)
+
 Terminal utilities for C-language.
 
 This library enables to change foreground or background color, to move cursor
