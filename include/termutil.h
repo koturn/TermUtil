@@ -29,6 +29,7 @@
 #  include <fcntl.h>
 #  include <termios.h>
 #  include <unistd.h>
+#  include <sys/ioctl.h>
 #endif
 
 #ifndef __TU_NOINLINE__
@@ -51,6 +52,11 @@
 #  define __TU_INLINE__
 #endif
 
+
+typedef struct {
+  int row;
+  int col;
+} TuTermSize;
 
 #if defined(__TU_USE_CURSES__)
 typedef enum {
@@ -154,6 +160,9 @@ extern "C" {
 #endif
 void
 tu_init(void);
+
+__TU_STATIC__ __TU_INLINE__ TuTermSize
+tu_get_termsize(void);
 
 __TU_STATIC__ __TU_INLINE__ void
 tu_set_color(TuColor fc, TuColor bc);

@@ -3,6 +3,32 @@
 
 
 /*!
+ * @brief Get terminal size
+ * @return Terminal size
+ */
+__TU_STATIC__ __TU_INLINE__ TuTermSize
+tu_get_termsize(void)
+{
+  TuTermSize tts;
+#if defined(__TU_USE_CURSES__)
+  getmaxyx(stdscr, tts.row, tts.col);
+#elif defined(_MSC_VER)
+  extern HANDLE hConsoleStdOut;
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
+  GetConsoleScreenBufferInfo(hConsoleStdOut, &csbi);
+  tts.row = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+  tts.col = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#else
+  struct winsize termSize;
+  ioctl(fileno(stdout), TIOCGWINSZ, &termSize);
+  tts.row = termSize.ws_row;
+  tts.col = termSize.ws_col;
+#endif
+  return tts;
+}
+
+
+/*!
  * @brief Set foreground color and background color
  * @param [in] fc  Foreground color
  * @param [in] bc  Background color
