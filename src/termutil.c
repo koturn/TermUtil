@@ -26,9 +26,6 @@
 static void
 tu_cleanup(void);
 
-static void
-sigint_handler(int sig);
-
 
 #if defined(__TU_USE_CURSES__)
 int tu_current_color = 0;
@@ -71,8 +68,6 @@ tu_init(void)
 #else
   tcgetattr(STDIN_FILENO, &tu_init_tio);
 #endif
-  signal(SIGINT, sigint_handler);
-  atexit(tu_cleanup);
 }
 
 
@@ -90,18 +85,6 @@ tu_cleanup(void)
 #else
   tcsetattr(STDIN_FILENO, TCSANOW, &tu_init_tio);
 #endif
-}
-
-
-/*!
- * @brief Signal handler
- * @param [in] sig  signal
- */
-static void
-sigint_handler(int sig)
-{
-  tu_cleanup();
-  exit(0);
 }
 
 
