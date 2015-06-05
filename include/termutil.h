@@ -161,6 +161,9 @@ extern "C" {
 void
 tu_init(void);
 
+void
+tu_cleanup(void);
+
 __TU_STATIC__ __TU_INLINE__ TuTermSize
 tu_get_termsize(void);
 

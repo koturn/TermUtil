@@ -23,10 +23,6 @@
 #include "../include/termutil.h"
 
 
-static void
-tu_cleanup(void);
-
-
 #if defined(__TU_USE_CURSES__)
 int tu_current_color = 0;
 #elif defined(_MSC_VER)
@@ -74,7 +70,7 @@ tu_init(void)
 /*!
  * @brief Restore initial state
  */
-static void
+void
 tu_cleanup(void)
 {
 #if defined(__TU_USE_CURSES__)
